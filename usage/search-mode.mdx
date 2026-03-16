@@ -1,0 +1,120 @@
+---
+title: "Search mode"
+description: "Look up quiz answers without joining a game using the -s flag."
+---
+
+Search mode lets you fetch and display the correct answers for a Kahoot quiz without joining a
+live game. Pass the `-s` flag to activate it.
+
+<Note>
+  Using `-s` cancels the `-n` (nickname) and `-p` (pin) options — you do not need a game pin in
+  search mode.
+</Note>
+
+## When to use search mode
+
+- Preview answers before a game starts.
+- Verify you have found the right quiz before joining.
+- Study the material in a quiz at your own pace.
+
+## Sub-modes
+
+### Search by ID
+
+Fetch answers for a specific quiz directly using its UUID. No login required.
+
+```bash
+python kbot -s -i "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+```
+
+### Search by name
+
+Search for quizzes by title. Requires a Kahoot account.
+
+```bash
+python kbot -s -q "Python Basics" -e user@example.com -a mypassword
+```
+
+kbot fetches up to `--maxCount` results (default: 50) and walks through them interactively.
+
+## Interactive name search flow
+
+When searching by name with `-s -q`, kbot prompts you for each matching quiz before fetching its
+answers:
+
+<Steps>
+  <Step title="kbot fetches matching quizzes">
+    kbot queries Kahoot for quizzes matching your search term and prints how many were found.
+
+    ```text
+    3 matching quizzes found
+    ```
+  </Step>
+  <Step title="Confirm each quiz">
+    For every result, kbot asks whether to check it:
+
+    ```text
+    Check 'Python Basics - Chapter 1'? [y/N]
+    ```
+
+    Enter `y` (or `yes`) to fetch and display the answers for that quiz. Press Enter or enter
+    anything else to skip to the next result.
+  </Step>
+  <Step title="Answers are printed">
+    For each confirmed quiz, kbot prints the title, creator, description, and the correct answer
+    for every question.
+  </Step>
+</Steps>
+
+## Example output
+
+When answers are found, kbot prints them in this format:
+
+```text
+Title: Python Basics
+Creator: quiz_creator
+Desc: A quiz covering Python fundamentals.
+What is the output of print(2 + 2)?
+	4
+Which keyword defines a function in Python?
+	def
+What data type is the value True?
+	bool
+```
+
+<Tip>
+  Questions that are not standard multiple-choice (e.g. open-ended or slide types) are skipped
+  and shown as `NOT A QUESTION` internally — they will not appear in the printed output.
+</Tip>
+
+## Controlling result count with -m
+
+By default kbot fetches up to 50 quizzes when searching by name. Use `-m` to change this.
+
+<ParamField path="-m" type="number" default="50">
+  **`--maxCount`** — Maximum number of quiz results to fetch from the search API.
+
+  Lower values speed up the initial search but may miss the quiz you want if it is not in the
+  top results.
+</ParamField>
+
+<CodeGroup>
+
+```bash Limit to 10 results
+python kbot -s -q "Python Basics" -e user@example.com -a mypassword -m 10
+```
+
+```bash Default (50 results)
+python kbot -s -q "Python Basics" -e user@example.com -a mypassword
+```
+
+```bash Search by ID (no login, no limit)
+python kbot -s -i "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+```
+
+</CodeGroup>
+
+<Warning>
+  Name-based search results depend on Kahoot's relevance ranking. If a quiz is private or not
+  publicly listed, it will not appear in search results regardless of `--maxCount`.
+</Warning>

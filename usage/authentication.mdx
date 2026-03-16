@@ -1,0 +1,77 @@
+---
+title: "Authentication"
+description: "When and how kbot authenticates with Kahoot, including 2FA support."
+---
+
+Authentication is **optional**. kbot only needs a Kahoot account when searching for a quiz by name
+using the `-q` flag. If you already know the quiz UUID, you can use `-i` and skip login entirely.
+
+## When authentication is required
+
+| Lookup method | Auth required? |
+|---|---|
+| `-i <uuid>` — direct quiz ID | No |
+| `-q <name>` — search by name | Yes (`-e` and `-a` required) |
+| `-s -i <uuid>` — search mode by ID | No |
+| `-s -q <name>` — search mode by name | Yes (`-e` and `-a` required) |
+
+## How it works
+
+<Steps>
+  <Step title="kbot sends credentials to Kahoot">
+    kbot makes a `POST` request to `https://create.kahoot.it/rest/authenticate` with your email,
+    password, and `grant_type: password`.
+  </Step>
+  <Step title="Kahoot returns a bearer token">
+    On success, Kahoot responds with an `access_token`. kbot stores this token in memory for the
+    duration of the session.
+  </Step>
+  <Step title="Token is used for quiz searches">
+    All subsequent quiz search requests include the token in an `Authorization: Bearer <token>`
+    header.
+  </Step>
+</Steps>
+
+<Note>
+  Credentials are never written to disk. They are held in memory only for the current session
+  and discarded when kbot exits.
+</Note>
+
+## Two-factor authentication (2FA)
+
+If the Kahoot game host has enabled 2FA, kbot will prompt you to enter a color sequence after
+joining the game.
+
+### How to enter the 2FA sequence
+
+1. Watch the Kahoot screen — it displays a sequence of colored shapes.
+2. Type the first letter of each color in the order shown, then press Enter.
+
+| Color | Letter |
+|---|---|
+| Red | `r` |
+| Blue | `b` |
+| Yellow | `y` |
+| Green | `g` |
+
+**Example:** If the screen shows Red → Blue → Yellow → Green, enter `rbyg`.
+
+```text Terminal prompt
+2fa (e.g. rbyg, yrgb) > rbyg
+```
+
+<Tip>
+  You have a limited time to enter the sequence before the game times out. Have the Kahoot
+  screen visible before running kbot on 2FA-enabled games.
+</Tip>
+
+## Security
+
+<Warning>
+  Never share your Kahoot credentials with anyone or commit them to source control. Use
+  environment variables or a secrets manager if you are automating kbot in a script.
+</Warning>
+
+- Credentials are transmitted directly to `create.kahoot.it` over HTTPS.
+- No credentials or tokens are written to any file.
+- The session token expires when the process ends.

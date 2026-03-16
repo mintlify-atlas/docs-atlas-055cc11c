@@ -1,80 +1,121 @@
 ---
 title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+description: "Get your Kahoot Answer Bot running in under 5 minutes."
 ---
 
-## Get started in three steps
+This guide walks you through running `kbot` for the first time. By the end, you'll have the bot join a live Kahoot game and answer every question automatically.
 
-Get your documentation site running locally and make your first customization.
+## Prerequisites
 
-### Step 1: Set up your local environment
+- Python 3.9 installed ([Installation guide](/installation))
+- Dependencies installed: `python3.9 -m pip install -r requirements.txt`
+- A live Kahoot game in progress (you need the game pin)
+- The quiz's UUID **or** a Kahoot account to search by name
 
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
+<Steps>
+  <Step title="Get the game pin">
+    The game pin is the 6–7 digit code shown on the Kahoot lobby screen when the host starts the game. You'll need this to join.
 
-### Step 2: Deploy your changes
+    Example: `123456`
+  </Step>
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+  <Step title="Get the quiz ID">
+    The quiz ID is a UUID that uniquely identifies the Kahoot. It looks like:
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+    ```
+    xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    ```
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+    You can find it in the URL when you open the quiz on [create.kahoot.it](https://create.kahoot.it):
 
-### Step 3: Go live
+    ```
+    https://create.kahoot.it/details/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    ```
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+    <Tip>
+      If you don't have the quiz ID, you can search by name instead — but this requires a Kahoot account. See [Authentication](/usage/authentication) for details.
+    </Tip>
+  </Step>
 
-## Next steps
+  <Step title="Run the bot">
+    Open a terminal, navigate to the directory containing `kbot`, then run:
 
-Now that you have your docs running, explore these key features:
+    ```bash
+    python kbot -n "MyNickname" -p 123456 -i "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    ```
+
+    Replace:
+    - `MyNickname` — the nickname the bot will join with
+    - `123456` — the game pin shown on the host's screen
+    - `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` — the quiz UUID
+
+    If you want to search by name instead of ID (requires login):
+
+    ```bash
+    python kbot -n "MyNickname" -p 123456 -q "My Quiz Title" -e user@example.com -a mypassword
+    ```
+  </Step>
+
+  <Step title="Watch it answer">
+    Once connected, you'll see output like:
+
+    ```
+    ANSWERS RECEIVED
+    GET READY
+    ------ 1 ------
+    SELECTED BLUE
+    TIME UP
+    ------ 2 ------
+    SELECTED RED
+    TIME UP
+    ------ 3 ------
+    SELECTED GREEN
+    GAME OVER
+    ```
+
+    The bot automatically submits the correct answer color for each question. When the game ends, it exits cleanly.
+
+    <Note>
+      If the host enabled **2FA**, you'll be prompted to enter the color sequence shown on screen (e.g. `rbyg` for Red, Blue, Yellow, Green). See [Authentication](/usage/authentication) for details.
+    </Note>
+  </Step>
+</Steps>
+
+## Common invocations
+
+<CodeGroup>
+
+```bash By quiz ID (no login required)
+python kbot -n "BotName" -p 123456 -i "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+```
+
+```bash By quiz name (login required)
+python kbot -n "BotName" -p 123456 -q "Quiz Title" -e user@example.com -a mypassword
+```
+
+```bash Interactive mode (prompted for all inputs)
+python kbot
+```
+
+```bash Preview answers without joining
+python kbot -s -i "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+```
+
+</CodeGroup>
+
+## What to do next
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Command reference" icon="terminal" href="/usage/command-reference">
+    See every available flag and option.
+  </Card>
+  <Card title="Search mode" icon="magnifying-glass" href="/usage/search-mode">
+    Preview quiz answers without joining a game.
+  </Card>
+  <Card title="Caveats" icon="triangle-exclamation" href="/reference/caveats">
+    Learn when the bot won't work correctly.
+  </Card>
+  <Card title="How it works" icon="gear" href="/reference/how-it-works">
+    Understand the internals of the bot.
+  </Card>
 </CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>

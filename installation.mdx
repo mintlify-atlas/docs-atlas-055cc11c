@@ -1,0 +1,118 @@
+---
+title: "Installation"
+description: "Install Python 3.9 and kbot's dependencies on Windows, macOS, or Linux."
+---
+
+## Prerequisites
+
+- **Python 3.9** — kbot requires Python 3.9 specifically due to dependency constraints.
+- **A Kahoot account** (optional) — only needed if you want to search for quizzes by name using the `-q` flag. Searching by ID works without an account.
+
+## Install Python 3.9
+
+<Tabs>
+  <Tab title="Windows">
+    1. Go to the [Python 3.9 Windows installer](https://www.python.org/downloads/windows/) page.
+    2. Download the **Python 3.9 installer** (64-bit recommended).
+    3. Run the installer. Check **Add Python to PATH** before clicking Install Now.
+    4. Verify the installation:
+
+    ```bash
+    python --version
+    ```
+  </Tab>
+  <Tab title="macOS">
+    1. Go to the [Python 3.9 macOS installer](https://www.python.org/downloads/macos/) page.
+    2. Download the **Python 3.9 universal2 installer**.
+    3. Open the `.pkg` file and follow the installer prompts.
+    4. Verify the installation:
+
+    ```bash
+    python3.9 --version
+    ```
+  </Tab>
+  <Tab title="Debian / Ubuntu">
+    Python 3.9 must be compiled from source on Debian and Ubuntu.
+
+    ```bash
+    sudo apt update && sudo apt install -y build-essential wget
+    wget https://www.python.org/ftp/python/3.9.7/Python-3.9.7.tgz
+    tar -xf Python-3.9.7.tgz
+    cd Python-3.9.7
+    ./configure --enable-optimizations
+    make -j$(nproc)
+    sudo make altinstall
+    ```
+
+    Using `altinstall` keeps your system Python untouched.
+  </Tab>
+  <Tab title="Arch Linux">
+    Install the `python39` package from the AUR using your preferred AUR helper:
+
+    ```bash
+    yay -S python39
+    ```
+
+    Or with `paru`:
+
+    ```bash
+    paru -S python39
+    ```
+  </Tab>
+</Tabs>
+
+## Install kbot
+
+<Steps>
+  <Step title="Clone the repository">
+    <CodeGroup>
+
+    ```bash Git
+    git clone https://github.com/Raymo111/kahoot-answer-bot.git
+    cd kahoot-answer-bot
+    ```
+
+    ```bash ZIP download
+    # Download the ZIP from GitHub and extract it, then navigate into the folder:
+    cd kahoot-answer-bot
+    ```
+
+    </CodeGroup>
+  </Step>
+
+  <Step title="Install dependencies">
+    Run the following command from inside the `kahoot-answer-bot` directory:
+
+    ```bash
+    python3.9 -m pip install -r requirements.txt
+    ```
+
+    This installs the following packages:
+
+    | Package | Version |
+    |---|---|
+    | `requests` | >=2.20.0 |
+    | `aiocometd` | 0.4.5 |
+    | `py_mini_racer` | 0.6.0 |
+    | `colorama` | 0.4.6 |
+  </Step>
+
+  <Step title="Verify the installation">
+    Confirm that Python 3.9 and the dependencies are available:
+
+    ```bash
+    python3.9 --version
+    python3.9 -m pip show requests aiocometd py_mini_racer colorama
+    ```
+
+    You should see version information printed for each package.
+  </Step>
+</Steps>
+
+## Next steps
+
+Now that kbot is installed, run your first bot:
+
+<Card title="Quickstart" icon="rocket" href="/quickstart">
+  Join a live Kahoot game and submit answers automatically in under five minutes.
+</Card>

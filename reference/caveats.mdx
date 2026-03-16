@@ -1,0 +1,65 @@
+---
+title: "Caveats and limitations"
+description: "Known scenarios where the bot will not work correctly or will produce wrong answers."
+---
+
+The bot relies on the Kahoot API returning quizzes in a fixed, predictable order. Certain host settings and quiz configurations break this assumption.
+
+## Private quizzes
+
+<Warning>
+  The bot cannot fetch answers for private quizzes. The Kahoot API returns an error when the authenticated user does not own the quiz or it is not set to public.
+</Warning>
+
+If the quiz is private, answer lookup fails and the bot either falls back to `DEFAULT_ANSWER` or exits with an error. To work around this, you must own the quiz (or have it shared with your account) and pass the quiz UUID directly with the `-i` flag.
+
+## Answer randomization
+
+<Warning>
+  If the host has enabled "Randomize answer order", the bot will submit the wrong answer for most questions.
+</Warning>
+
+The Kahoot API returns answers in a fixed canonical order. When the host enables answer randomization, the order shown in-game differs from the API order. Because the bot submits the index from the API response, it targets the wrong position on the randomized board.
+
+There is no way to detect whether answer randomization is enabled before the question appears. If you notice the bot consistently picking incorrect answers, this setting is likely the cause.
+
+## Question randomization
+
+<Warning>
+  If the host has enabled "Randomize question order", the bot's pre-fetched answer list will be in the wrong sequence.
+</Warning>
+
+The bot fetches all answers before the game starts and stores them in the original API order. When questions appear in a shuffled sequence, the bot submits the answer for question N from the API list against whatever question the server sends at position N — which will be incorrect.
+
+## Quiz not found
+
+When searching for a quiz by name with `-q`, the bot queries the public Kahoot search API. If no public quiz matches the provided name, the bot exits with:
+
+```
+No quiz found. (private?)
+```
+
+This can happen when:
+- The quiz title is slightly different from what you typed
+- The quiz is private and does not appear in public search results
+- The quiz has been deleted
+
+Use `-i` with the direct quiz UUID to bypass name search entirely.
+
+## Fallback answer
+
+<Note>
+  When answers cannot be fetched at all, the bot submits `DEFAULT_ANSWER = 1` (index 1 = BLUE) for every question.
+</Note>
+
+This fallback is intentional — it keeps the bot in the game rather than crashing. However, a hardcoded answer of BLUE will be correct only by chance. If you see "SELECTED FALLBACK" in the console output, answer fetching failed.
+
+## Non-question slides
+
+Kahoot quizzes can include non-interactive content such as slides, videos, and info screens. The bot only handles these question types:
+
+```python
+allowedTypes = ['quiz', 'multiple_select_quiz']
+```
+
+All other content types are skipped during answer pre-fetching. The bot inserts a placeholder for each skipped item to keep the answer list aligned with the question index. If the placeholder offset is wrong, subsequent answers may be submitted for the wrong questions.

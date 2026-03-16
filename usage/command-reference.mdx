@@ -1,0 +1,102 @@
+---
+title: "Command reference"
+description: "Full reference for every kbot CLI flag with usage examples."
+---
+
+All flags are optional — if you omit any of them, kbot will prompt you interactively at startup.
+
+## Game flags
+
+Use these flags when joining a live Kahoot game.
+
+<ParamField path="-n" type="string">
+  **`--nick`** — The nickname to join the Kahoot game with.
+
+  Optional. If omitted, kbot prompts for it interactively.
+</ParamField>
+
+<ParamField path="-p" type="string">
+  **`--pin`** — The game pin shown on the Kahoot lobby screen.
+
+  Optional. If omitted, kbot prompts for it interactively.
+</ParamField>
+
+## Quiz lookup flags
+
+Use these flags to identify which quiz to pull answers from. Provide either `-i` or `-q`, not both.
+
+<ParamField path="-i" type="string">
+  **`--quizID`** — The UUID of the quiz to look up.
+
+  Format: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx` (8-4-4-4-12 alphanumeric characters).
+
+  Does not require authentication. Takes precedence over `-q` when both are supplied.
+</ParamField>
+
+<ParamField path="-q" type="string">
+  **`--quizName`** — The name of the quiz to search for.
+
+  Requires authentication (`-e` and `-a`). kbot fetches up to `--maxCount` results and checks each one.
+</ParamField>
+
+## Auth flags
+
+Required when using name-based lookup (`-q`). Not needed when using a direct quiz ID (`-i`).
+
+<ParamField path="-e" type="string">
+  **`--email`** — The email address for your `create.kahoot.it` account.
+</ParamField>
+
+<ParamField path="-a" type="string">
+  **`--password`** — The password for your `create.kahoot.it` account.
+</ParamField>
+
+## Mode flags
+
+<ParamField path="-s" type="boolean" default="false">
+  **`--search`** — Search for quiz answers without joining a game.
+
+  Cancels the `-n` (nick) and `-p` (pin) options. See [Search mode](/usage/search-mode) for details.
+</ParamField>
+
+<ParamField path="-d" type="boolean" default="false">
+  **`--debug`** — Enable verbose debug output.
+</ParamField>
+
+<ParamField path="-m" type="number" default="50">
+  **`--maxCount`** — How many quizzes to fetch when searching by name with `-q`.
+
+  Only relevant when using `-q`. Higher values increase search coverage but slow down the lookup.
+</ParamField>
+
+## Usage examples
+
+<CodeGroup>
+
+```bash Play by quiz ID (no login)
+python kbot -n "BotName" -p 123456 -i "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+```
+
+```bash Play by name (login required)
+python kbot -n "BotName" -p 123456 -q "My Quiz" -e user@example.com -a mypassword
+```
+
+```bash Interactive mode (prompted)
+python kbot
+```
+
+```bash Debug mode
+python kbot -n "BotName" -p 123456 -i "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" -d
+```
+
+</CodeGroup>
+
+<Tip>
+  Playing by quiz ID (`-i`) is faster and does not require a Kahoot account. Use name-based search
+  (`-q`) when you only know the quiz title.
+</Tip>
+
+<Note>
+  The quiz UUID follows the standard format `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+  (8-4-4-4-12 alphanumeric characters). You can find it in the quiz URL on `create.kahoot.it`.
+</Note>

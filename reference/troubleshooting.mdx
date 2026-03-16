@@ -1,0 +1,131 @@
+---
+title: "Troubleshooting"
+description: "Solutions to common errors and unexpected behavior when running the Kahoot Answer Bot."
+---
+
+<AccordionGroup>
+  <Accordion title='"Invalid Email or Password"'>
+    The credentials passed to `-e` (email) and `-a` (password) are incorrect.
+
+    Double-check that you are using your Kahoot account credentials, not a Google or Microsoft SSO login. If you use social login, you may need to set a separate Kahoot password at [kahoot.com](https://kahoot.com).
+
+    ```bash
+    python3.9 bot.py -e your@email.com -a yourpassword ...
+    ```
+  </Accordion>
+
+  <Accordion title='"Authentication required when searching for quizzes by name"'>
+    You used the `-q` (quiz name search) flag without providing credentials.
+
+    Name-based search requires a logged-in session. Add `-e` and `-a` with your Kahoot credentials:
+
+    ```bash
+    python3.9 bot.py -q "quiz name" -e your@email.com -a yourpassword -p 123456 -n nickname
+    ```
+
+    Alternatively, skip name search and provide the quiz UUID directly with `-i`.
+  </Accordion>
+
+  <Accordion title='"Pin does not exist"'>
+    The game pin you provided is invalid or the game has not started yet.
+
+    - Confirm the pin from the host's screen — it changes every session.
+    - Make sure the host has launched the game, not just opened the quiz editor.
+    - Pins are numeric strings; do not include spaces or dashes.
+  </Accordion>
+
+  <Accordion title='"Invalid UUID"'>
+    The quiz ID passed to `-i` is not a valid UUID.
+
+    Kahoot quiz UUIDs follow the standard format:
+
+    ```
+    xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+    ```
+
+    Example: `1a2b3c4d-5e6f-7890-abcd-ef1234567890`
+
+    Copy the UUID directly from the Kahoot quiz URL to avoid typos.
+  </Accordion>
+
+  <Accordion title='"No quiz found. (private?)"'>
+    The name search returned no results, or the quiz is private.
+
+    - Check spelling — the search is exact and does not fuzzy-match.
+    - If the quiz is private, name search will never find it.
+    - Use `-i` with the quiz UUID instead of `-q` with the name:
+
+    ```bash
+    python3.9 bot.py -i <uuid> -p 123456 -n nickname -e your@email.com -a yourpassword
+    ```
+  </Accordion>
+
+  <Accordion title='"Something went wrong finding answers"'>
+    The bot encountered an error while calling the Kahoot API to fetch answers.
+
+    Common causes:
+    - The quiz has been deleted.
+    - The quiz is private and your account does not have access.
+    - A temporary Kahoot API outage.
+
+    Try again after a moment. If the error persists, verify the quiz is public by opening its URL in a browser while logged out.
+  </Accordion>
+
+  <Accordion title="ModuleNotFoundError">
+    A required Python package is missing.
+
+    Install all dependencies with:
+
+    ```bash
+    python3.9 -m pip install -r requirements.txt
+    ```
+
+    Make sure you are using **Python 3.9** specifically. The `py_mini_racer` package does not build correctly on all Python versions.
+
+    ```
+    requests>=2.20.0
+    aiocometd==0.4.5
+    py_mini_racer==0.6.0
+    colorama==0.4.6
+    ```
+  </Accordion>
+
+  <Accordion title="Bot submits wrong answers">
+    The host has enabled answer randomization, question randomization, or both.
+
+    The bot uses the canonical answer order from the Kahoot API. When the host shuffles answers or questions, the in-game order no longer matches what the API returned, so the bot picks the wrong index.
+
+    There is no workaround for randomized games. See [Caveats and limitations](/reference/caveats) for a full explanation.
+  </Accordion>
+
+  <Accordion title="Bot gets kicked / username rejected">
+    The host has blocked the nickname you chose.
+
+    Kahoot hosts can configure banned words or require approval for nicknames. Try a different value for the `-n` flag — something that looks like a normal player name is less likely to be filtered.
+
+    If you see the `USERNAME_REJECTED` event printed to the console, the bot was refused before the game started.
+  </Accordion>
+
+  <Accordion title="Two-factor authentication (2FA) prompt appears">
+    The host has enabled 2FA. The bot will prompt you to enter the color sequence.
+
+    Enter the colors shown on screen using their first letters, one at a time:
+
+    | Key | Color |
+    |---|---|
+    | `r` | Red |
+    | `b` | Blue |
+    | `y` | Yellow |
+    | `g` | Green |
+
+    The bot handles the `RESET_TWO_FACTOR_AUTH` and `TWO_FACTOR_AUTH_CORRECT` events automatically once you submit the correct sequence.
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+  Use the `-d` flag to enable debug mode. This prints raw API responses to the console, which makes it easier to identify exactly where the bot is failing:
+
+  ```bash
+  python3.9 bot.py -d ...
+  ```
+</Tip>

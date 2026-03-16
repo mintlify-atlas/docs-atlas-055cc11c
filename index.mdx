@@ -1,97 +1,54 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Kahoot Answer Bot"
+description: "A Python CLI bot that automatically finds and submits correct answers to Kahoot quizzes — get a perfect score every time."
 ---
 
-## Setting up
-
-Get your documentation site up and running in minutes.
-
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={2}>
+  <Card title="Installation" icon="download" href="/installation">
+    Install Python 3.9 and the required dependencies on Windows, macOS, or Linux.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Run your first bot in under 5 minutes with a step-by-step guide.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Command Reference" icon="terminal" href="/usage/command-reference">
+    Every flag and option available in the `kbot` CLI, with examples.
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="How It Works" icon="gear" href="/reference/how-it-works">
+    Understand the WebSocket client simulation and challenge-solving internals.
   </Card>
-</Columns>
+</CardGroup>
 
-## Create beautiful pages
+## What is Kahoot Answer Bot?
 
-Everything you need to create world-class documentation.
+Kahoot Answer Bot (`kbot`) is a Python command-line tool that joins a live Kahoot game and automatically submits the correct answer for every question. It works by:
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+1. Looking up the quiz answers from the Kahoot API — either by quiz UUID or by searching with a name
+2. Connecting to the Kahoot game server over WebSocket, impersonating a standard browser client
+3. Listening for question events and submitting the correct answer index for each question
 
-## Need inspiration?
+<Note>
+This project was forked from [reteps/kbot](https://github.com/reteps/kbot) and updated with 2FA support, search-by-ID, and various fixes to work with the current Kahoot API.
+</Note>
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+## Key features
+
+<CardGroup cols={2}>
+  <Card title="Search by name or ID" icon="magnifying-glass">
+    Find any public Kahoot by its UUID or by searching for it by name. Name search requires a Kahoot account.
+  </Card>
+  <Card title="2FA support" icon="shield-check">
+    Handles Kahoot's two-factor authentication challenge automatically during game join.
+  </Card>
+  <Card title="Search-only mode" icon="eye">
+    Preview quiz answers without actually joining a game. Useful for inspecting quizzes before playing.
+  </Card>
+  <Card title="Debug mode" icon="bug">
+    Enable verbose output to inspect raw API responses and WebSocket messages during execution.
+  </Card>
+</CardGroup>
+
+## Caveats
+
+<Warning>
+Kahoot Answer Bot does **not** work when the host has enabled answer randomization or question randomization. It relies on the original answer order from the API, so shuffled answers will produce incorrect selections. See [Caveats](/reference/caveats) for details.
+</Warning>
